@@ -42,8 +42,8 @@ Usage
     IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', 24); // true
     IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', '24'); // true
     IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', '255.255.255.0'); // true
-    
-    
+
+
     IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', 24); // false
     IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', '24'); // false
     IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', '255.255.255.0'); // false

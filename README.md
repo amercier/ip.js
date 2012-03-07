@@ -10,7 +10,7 @@ Usage
 
 The following static methods are available:
 
-   * [IPv4.isAddressInSubnet](#IPv4.isAddressInSubnet): check whether an IP address is in a subnet
+   * [`IPv4.isAddressInSubnet`](#IPv4.isAddressInSubnet): check whether an IP address is in a subnet
    * [#IPv4.isSubnetNetworkAddress]: check whether an IP address is the network address of a subnet
    * [#IPv4.getSubnetNetworkAddress]: get the network address of a subnet
    * [#IPv4.isSubnetBroadcastAddress]: check whether an IP address is the network address of a subnet
@@ -32,7 +32,7 @@ The following Class methods are available:
 
 === Static methods ===
 
-==== IPv4.isAddressInSubnet ====                        {IPv4.isAddressInSubnet}
+==== <a href="#IPv4.isAddressInSubnet">IPv4.isAddressInSubnet</a> ====
 
 ```
 IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', 24); // true

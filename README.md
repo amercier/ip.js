@@ -5,8 +5,8 @@ ip.js - Internet Protocol Javascript library
 A JavaScript library to manipulate IPv4 addresses and subnets.
 
 
-Usage
------
+Overview
+--------
 
 The following static methods are available:
 
@@ -29,11 +29,14 @@ The following Class methods are available:
    * **IPv4.Subnet:**
        * `new IPv4.Subnet(...)`
        * `IPV4.Subnet.toString()`
+       
 
+Usage
+-----
 
-=== Static methods ===
+### Static methods ###
 
-==== IPv4.isAddressInSubnet ====
+#### IPv4.isAddressInSubnet ####
 
 ```
 IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', 24); // true
@@ -48,39 +51,41 @@ IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', '255.255.255.0'); // false
 
 
 
-=== Object-oriented methods ===
+### Object-oriented methods ###
 
 
-==== `IPv4.Subnet.isValidAddress` ====
+#### IPv4.Subnet.isValidAddress ####
 
-```
-new IPv4.Subnet('192.168.1.0', 24).isValidAddress('192.168.1.10'); // true
-new IPv4.Subnet('192.168.1.0', '24').isValidAddress('192.168.1.10'); // true
-new IPv4.Subnet('192.168.1.0', '255.255.255.0').isValidAddress('192.168.1.10'); // true
-```
-```
-new IPv4.Subnet('192.168.2.0', 24).isValidAddress('192.168.1.10'); // false
-new IPv4.Subnet('192.168.2.0', '24').isValidAddress('192.168.1.10'); // false
-new IPv4.Subnet('192.168.2.0', '255.255.255.0').isValidAddress('192.168.1.10'); // false
-```
-```
-new IPv4.Subnet(
-		new IPv4.Address('192.168.1.0'),
-		new IPv4.Mask('255.255.255.0')
-	).isValidAddress(
-		new IPv4.Address('192.168.1.10')
-	);  // true
-```
-```
-new IPv4.Subnet(
-		new IPv4.Address('192.168.1.0'),
-		new IPv4.Mask('255.255.255.0')
-	).isValidAddress(
-		new IPv4.Address('192.168.2.10')
-	);  // false
-```
+    new IPv4.Subnet('192.168.1.0', 24).isValidAddress('192.168.1.10'); // true
+    new IPv4.Subnet('192.168.1.0', '24').isValidAddress('192.168.1.10'); // true
+    new IPv4.Subnet('192.168.1.0', '255.255.255.0').isValidAddress('192.168.1.10'); // true
+
+    new IPv4.Subnet('192.168.2.0', 24).isValidAddress('192.168.1.10'); // false
+    new IPv4.Subnet('192.168.2.0', '24').isValidAddress('192.168.1.10'); // false
+    new IPv4.Subnet('192.168.2.0', '255.255.255.0').isValidAddress('192.168.1.10'); // false
+
+    new IPv4.Subnet(
+            new IPv4.Address('192.168.1.0'),
+            new IPv4.Mask('255.255.255.0')
+        ).isValidAddress(
+            new IPv4.Address('192.168.1.10')
+        ); // true
+
+    new IPv4.Subnet(
+            new IPv4.Address('192.168.1.0'),
+            new IPv4.Mask('255.255.255.0')
+        ).isValidAddress(
+            new IPv4.Address('192.168.2.10')
+        ); // false
+
 
 Benefits
 --------
+
+
+
+
+License
+-------
 
 

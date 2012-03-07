@@ -17,15 +17,16 @@ The following static methods are available:
    * `IPv4.getSubnetBroadcastAddress`: get the broadcast address of a subnet
 
 
+
 The following Class methods are available:
 
-   * **`IPv4.Mask`:**
+   * **IPv4.Mask:**
        * `new IPv4.Mask(...)`
        * `IPV4.Mask.toString()`
-   * **`IPv4.Address`]:**
+   * **IPv4.Address:**
        * `new IPv4.Address(...)`
        * `IPV4.Address.toString()`
-   * **`IPv4.Subnet`:**
+   * **IPv4.Subnet:**
        * `new IPv4.Subnet(...)`
        * `IPV4.Subnet.toString()`
 

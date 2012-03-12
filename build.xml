@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="ip.js" basedir=".">
+
+	<!-- Import Ant-Contrib Tasks -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="build/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	
+	<!--
+	============================================================================
+	js-concatenate
+	
+	Concatenate the following files into ${basedir}/public/js/<output>:
+	- ${basedir}/public/js/lib/jquery*.js
+	- ${basedir}/public/js/*.js
+	============================================================================
+	-->
+	<target name="js-concatenate" description="Concatenate a set of files">
+		<echo message="Concatenating JS files to ${output}"/>
+		<delete file="${output}"/>
+		<for list="${input-include}" param="input-file">
+			<sequential>
+				<echo message="Adding: @{input-file}"/>
+				<concat destfile="${output}" append="yes">
+					<fileset
+						dir="${input-dir}"
+						includes="@{input-file}"
+						excludes="${input-exclude}"
+					/>
+				</concat>
+			</sequential>
+		</for>
+	</target>
+	
+	<!--
+	============================================================================
+	js-minify
+	
+	Concatenate and minify the source files into /bin/:
+	   - ipv4.min.js: contains IPv4.js
+	
+	============================================================================
+	-->
+	<target name="js-minify" description="Concatenate and minify ip.js source files">
+
+		<!-- ipv4.min.js -->
+		<antcall target="js-concatenate">
+			<param name="output"        value="${basedir}/bin/ipv4.min.js"/>
+			<param name="input-dir"     value="${basedir}/src"/>
+			<param name="input-include" value="IPv4.js"/>
+		</antcall>
+		
+		<!-- Compression -->
+		<echo message="Compressing JS files"/>
+		<taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+			<classpath>
+				<pathelement path="${basedir}/build/yuicompressor-2.4.7.jar" />
+				<pathelement path="${basedir}/build/YUIAnt.jar" />
+			</classpath>
+		</taskdef>
+		<yuicompress linebreak="80" warn="false" munge="no" preserveallsemicolons="false" outputfolder="${basedir}/bin">
+			<fileset dir="${basedir}/bin">
+				<include name="*.min.js" />
+			</fileset>
+		</yuicompress>
+		
+	</target>
+	
+	<!--
+	============================================================================
+	default
+	============================================================================
+	-->
+	<target name="default">
+		<antcall target="js-minify"/>
+	</target>
+	
+</project>

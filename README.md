@@ -88,6 +88,7 @@ Benefits
 --------
 
    - Full [RFC791](1) compliance
+   - Ultra lightweight: only 2kB minified
 
 
 License

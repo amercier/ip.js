@@ -8,17 +8,7 @@ A JavaScript library to manipulate IPv4 addresses and subnets.
 Overview
 --------
 
-The following static methods are available:
-
-   * `IPv4.isAddressInSubnet`: check whether an IP address is in a subnet
-   * `IPv4.isSubnetNetworkAddress`: check whether an IP address is the network address of a subnet
-   * `IPv4.getSubnetNetworkAddress`: get the network address of a subnet
-   * `IPv4.isSubnetBroadcastAddress`: check whether an IP address is the network address of a subnet
-   * `IPv4.getSubnetBroadcastAddress`: get the broadcast address of a subnet
-
-
-
-The following Class methods are available:
+The following methods are available:
 
    * **IPv4.Mask:**
        * `new IPv4.Mask(...)`
@@ -34,27 +24,8 @@ The following Class methods are available:
 Usage
 -----
 
-### Static methods ###
 
-#### IPv4.isAddressInSubnet ####
-
-```
-IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', 24); // true
-IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', '24'); // true
-IPv4.isAddressInSubnet('192.168.1.10', '192.168.1.0', '255.255.255.0'); // true
-```
-```
-IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', 24); // false
-IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', '24'); // false
-IPv4.isAddressInSubnet('192.168.2.10', '192.168.1.0', '255.255.255.0'); // false
-```
-
-
-
-### Object-oriented methods ###
-
-
-#### IPv4.Subnet.isValidAddress ####
+### IPv4.Subnet.isValidAddress ###
 
 ```
 new IPv4.Subnet('192.168.1.0', 24).isValidAddress('192.168.1.10'); // true
@@ -84,11 +55,39 @@ new IPv4.Subnet(
 ```
 
 
+### IPv4.Pool.getFirstAvailable/getLastAvailable ###
+
+
+```
+var pool1 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+pool1.getFirstAvailable(); // '192.168.0.1'
+pool1.getLastAvailable(); // '192.168.0.6'
+```
+
+```
+var pool2 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+pool2
+	.allocate('192.168.0.1')
+	.allocate('192.168.0.2')
+	.allocate('192.168.0.5')
+	.allocate('192.168.0.6');
+pool1.getFirstAvailable(); // '192.168.0.3'
+pool1.getLastAvailable(); // '192.168.0.4'
+```
+
+```
+var pool3 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+pool3.allocate(['192.168.0.1', '192.168.0.2', '192.168.0.3', '192.168.0.4', '192.168.0.5', '192.168.0.6']);
+pool3.getFirstAvailable(); // null (none available)
+pool3.getLastAvailable(); // null (none available)
+```
+
+
 Benefits
 --------
 
    - Full [RFC791](1) compliance
-   - Ultra lightweight: only 2kB minified
+   - Ultra lightweight: only 5kB minified
 
 
 License

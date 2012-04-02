@@ -47,6 +47,64 @@ test('IPv4.Address.toString()', function() {
 });
 
 
+test('IPv4.Address.getNext()', function() {
+	expect(6);
+	
+	var address1a = new IPv4.Address('0.0.0.0');
+	var address1b = new IPv4.Address('0.0.0.1');
+	
+	var address2a = new IPv4.Address('192.168.10.100');
+	var address2b = new IPv4.Address('192.168.10.101');
+	
+	var address3a = new IPv4.Address('192.168.0.255');
+	var address3b = new IPv4.Address('192.168.1.0');
+	
+	var address4a = new IPv4.Address('192.255.255.255');
+	var address4b = new IPv4.Address('193.0.0.0');
+	
+	var address5a = new IPv4.Address('127.255.255.255');
+	var address5b = new IPv4.Address('128.0.0.0');
+	
+	var address6 = new IPv4.Address('255.255.255.255');
+
+	deepEqual(address1a.getNext(), address1b, "new IPv4.Address('0.0.0.0').getNext() == '0.0.0.1'");
+	deepEqual(address2a.getNext(), address2b, "new IPv4.Address('192.168.10.100').getNext() == '192.168.10.101'");
+	deepEqual(address3a.getNext(), address3b, "new IPv4.Address('192.168.0.255').getNext() == '192.168.1.0'");
+	deepEqual(address4a.getNext(), address4b, "new IPv4.Address('192.255.255.255').getNext() == '193.0.0.0'");
+	deepEqual(address5a.getNext(), address5b, "new IPv4.Address('127.255.255.255').getNext() == '128.0.0.0'");
+	raises(address6.getNext, "new IPv4.Address('255.255.255.255').getNext() must throw an error");
+});
+
+
+test('IPv4.Address.getPrevious()', function() {
+	expect(6);
+	
+	var address1a = new IPv4.Address('255.255.255.255');
+	var address1b = new IPv4.Address('255.255.255.254');
+	
+	var address2a = new IPv4.Address('192.168.10.100');
+	var address2b = new IPv4.Address('192.168.10.99');
+	
+	var address3a = new IPv4.Address('192.168.1.0');
+	var address3b = new IPv4.Address('192.168.0.255');
+	
+	var address4a = new IPv4.Address('193.0.0.0');
+	var address4b = new IPv4.Address('192.255.255.255');
+	
+	var address5a = new IPv4.Address('128.0.0.0');
+	var address5b = new IPv4.Address('127.255.255.255');
+	
+	var address6 = new IPv4.Address('0.0.0.0');
+
+	deepEqual(address1a.getPrevious(), address1b, "new IPv4.Address('255.255.255.255').getPrevious() == '255.255.255.254'");
+	deepEqual(address2a.getPrevious(), address2b, "new IPv4.Address('192.168.10.100').getPrevious() == '192.168.10.99'");
+	deepEqual(address3a.getPrevious(), address3b, "new IPv4.Address('192.168.1.0').getPrevious() == '192.168.0.255'");
+	deepEqual(address4a.getPrevious(), address4b, "new IPv4.Address('193.0.0.0').getPrevious() == '192.255.255.255'");
+	deepEqual(address5a.getPrevious(), address5b, "new IPv4.Address('128.0.0.0').getPrevious() == '127.255.255.255'");
+	raises(address6.getPrevious, "new IPv4.Address('0.0.0.0').getPrevious() must throw an error");
+});
+
+
 /**
  * =============================================================================
  * IPv4.Mask
@@ -196,4 +254,62 @@ test("IPv4.isValidAddress()", function() {
 	ok(!subnet1.isValidAddress('192.168.255.255'), "new IPv4.Subnet('192.168.255.255', 16).isValidAddress('192.168.255.255') == false");
 	ok(!subnet1.isValidAddress('192.167.255.255'), "new IPv4.Subnet('192.168.0.0', 16).isValidAddress('192.167.255.255') == false");
 	ok(!subnet1.isValidAddress('192.169.0.0'), "new IPv4.Subnet('192.168.0.0', 16).isValidAddress('192.169.0.0') == false");
+});
+
+
+/**
+ * =============================================================================
+ * IPv4.Pool
+ * =============================================================================
+ */
+
+test("IPv4.Subnet.prototype.getFirstAvailableAddress()", function() {
+	
+	var address1 = new IPv4.Address('192.168.0.1');
+	var address2 = new IPv4.Address('192.168.0.2');
+	var address3 = new IPv4.Address('192.168.0.3');
+	var address4 = new IPv4.Address('192.168.0.4');
+	var address5 = new IPv4.Address('192.168.0.5');
+	var address6 = new IPv4.Address('192.168.0.6');
+	
+	var pool1 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+	
+	var pool2 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+	pool2
+		.allocate(address1)
+		.allocate(address2)
+		.allocate(address4);
+	
+	var pool3 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+	pool3.allocate([address1, address2, address3, address4, address5, address6]);
+	
+	deepEqual(pool1.getFirstAvailable(), address1, "new IPv4.Subnet('192.168.0.0', 24).toPool().getFirstAvailable() == '192.168.0.1'");
+	deepEqual(pool2.getFirstAvailable(), address3, "new IPv4.Subnet('192.168.0.0', 24).toPool().allocate(...).getFirstAvailable() == '192.168.0.3'");
+	strictEqual(pool3.getFirstAvailable(), null, "new IPv4.Subnet('192.168.0.0', 24).toPool().allocate(*).getFirstAvailable() === null");
+});
+
+test("IPv4.Subnet.prototype.getLastAvailableAddress()", function() {
+	
+	var address1 = new IPv4.Address('192.168.0.1');
+	var address2 = new IPv4.Address('192.168.0.2');
+	var address3 = new IPv4.Address('192.168.0.3');
+	var address4 = new IPv4.Address('192.168.0.4');
+	var address5 = new IPv4.Address('192.168.0.5');
+	var address6 = new IPv4.Address('192.168.0.6');
+	
+	var pool1 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+	
+	var pool2 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+	pool2
+		.allocate(address6)
+		.allocate(address5)
+		.allocate(address3);
+	
+	var pool3 = new IPv4.Subnet('192.168.0.0', 29).toPool();
+	pool3.allocate([address1, address2, address3, address4, address5, address6]);
+	
+	deepEqual(pool1.getLastAvailable(), address6, "new IPv4.Subnet('192.168.0.0', 24).toPool().getLastAvailable() == '192.168.0.6'");
+	deepEqual(pool2.getLastAvailable(), address4, "new IPv4.Subnet('192.168.0.0', 24).toPool().allocate(...).getLastAvailable() == '192.168.0.4'");
+	strictEqual(pool3.getLastAvailable(), null, "new IPv4.Subnet('192.168.0.0', 24).toPool().allocate(*).getLastAvailable() === null");
+	
 });

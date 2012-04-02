@@ -61,7 +61,7 @@
 				<pathelement path="${basedir}/build/YUIAnt.jar" />
 			</classpath>
 		</taskdef>
-		<yuicompress linebreak="80" warn="false" munge="no" preserveallsemicolons="false" outputfolder="${basedir}/bin">
+		<yuicompress linebreak="200" warn="false" munge="no" preserveallsemicolons="false" outputfolder="${basedir}/bin">
 			<fileset dir="${basedir}/bin">
 				<include name="*.min.js" />
 			</fileset>

@@ -67,6 +67,57 @@ IPv4.Address.prototype.toString = function() {
 		;
 };
 
+/**
+ * Get the next IP address
+ * 
+ * @return {IPv4.Address} Returns the next IP address
+ */
+IPv4.Address.prototype.getNext = function() {
+	
+	if(this.address == 2147483647) { // 0111..111 => 1000..000
+		return new IPv4.Address(-2147483648);
+	}
+	
+	if(this.address == -1) { // 255.255.255.255
+		throw 'IP address 255.255.255.255 has no next address';
+	}
+	
+	return new IPv4.Address(this.address + 1);
+};
+
+/**
+ * Get the previous IP address
+ * 
+ * @return {IPv4.Address} Returns the previous IP address
+ */
+IPv4.Address.prototype.getPrevious = function() {
+	
+	if(this.address == -2147483648) { // 1000..000 => 0111..111
+		return new IPv4.Address(2147483647);
+	}
+	
+	if(this.address == 0) { // 0.0.0.0
+		throw 'IP address 0.0.0.0 has no previous address';
+	}
+	
+	return new IPv4.Address(this.address - 1);
+};
+
+
+/** ========================================================================= */
+/**
+ * IP v4 Mask
+ * 
+ * @class IPv4.Mask
+ */
+
+/**
+ * Create an IP mask
+ * 
+ * @param {Number/String/IPv4.Address} mask The mask size (Ex: 24, '24') or
+ * address (Ex: '255.255.255.0', IPv4.Address('255.255.255.0'))
+ * @constructor
+ */
 IPv4.Mask = function(mask) {
 	
 	// Mask size (Ex: 24)
@@ -88,6 +139,11 @@ IPv4.Mask = function(mask) {
 	}
 };
 
+/**
+ * Compute the mask size
+ * 
+ * @return {Number} Returns the mask size
+ */
 IPv4.Mask.prototype.getMaskSize = function() {
 	
 	/**
@@ -234,3 +290,157 @@ IPv4.Subnet.prototype.isValidAddress = function(address) {
 		&& !this.isBroadcastAddress(tmpAddress)
 		;
 };
+
+/**
+ * 
+ * 
+ * @return {IPv4.Pool} Returns the pool 
+ */
+IPv4.Subnet.prototype.toPool = function() {
+	return new IPv4.Pool(this);
+};
+
+
+/** ========================================================================= */
+/**
+ * IP v4 address Pool
+ * 
+ * An IP address pool that can be defined from a subnet and can manage allocated
+ * IP addresses.
+ * 
+ *     new IPv4.Subnet('192.168.1.0', 24).getPool();
+ * 
+ * @param subnetOrNetwork
+ * @class IPv4.Pool
+ */
+IPv4.Pool = function(subnet) {
+	
+	// Subnet check
+	if(!subnet || !(subnet instanceof IPv4.Subnet)) {
+		throw 'Expecting parameter to be a IPv4.Subnet, ' + subnet + ' given.';
+	}
+	
+	/**
+	 * @type {IPv4.Subnet} The pool's subnet
+	 */
+	this.subnet = subnet;
+	
+	/**
+	 * @type {IPv4.Address[]} Allocated addresses
+	 */
+	this.allocatedAddresses = [];
+	
+};
+
+/**
+ * Determine whether an IP address is allocated or not. An allocated IP address
+ * is one of the IP address allocated within the pool using
+ * {@link #allocate the allocation method}.
+ * 
+ * @param {String/Number/IPv4.Address} address The address to test
+ * @return {Boolean} Return true if the address is allocated, false otherwise
+ */
+IPv4.Pool.prototype.isAllocated = function(address) {
+	
+	address = address instanceof IPv4.Address ? address : new IPv4.Address(address);
+	
+	if(!this.subnet.isValidAddress(address)) {
+		throw 'The IP address ' + address + ' does not belong to the subnet ' + this.subnet;
+	}
+	
+	for(var i = 0 ; i < this.allocatedAddresses.length ; i++) {
+		if(this.allocatedAddresses[i].address == address.address) {
+			return true;
+		}
+	}
+	
+	return false;
+};
+
+/**
+ * Determine whether an IP address is available or not. An available IP address
+ * is must match the two following conditions:
+ * 
+ *    - the address is {@link IPv4.Subnet#isValidAddress valid within the subnet} 
+ *    - the address is not {@link #isAllocated allocated}
+ *    
+ * @param {String/Number/IPv4.Address} address The address to test
+ * @return {Boolean} Return true if the address is allocated, false otherwise
+ */
+IPv4.Pool.prototype.isAvailable = function(address) {
+
+	address = address instanceof IPv4.Address ? address : new IPv4.Address(address);
+	
+	return this.subnet.isValidAddress(address) && !this.isAllocated(address);
+};
+
+/**
+ * Allocate an IP address
+ * 
+ * @param {String/Number/IPv4.Address/String[]/Number[]/IPv4.Address[]} address The address(es) to allocate
+ */
+IPv4.Pool.prototype.allocate = function(address) {
+	
+	// If an array, allocate all the IP addresses
+	if(toString.call(address) === "[object Array]") {
+		for(var i = 0 ; i < address.length ; i++) {
+			
+			var value = address[i];
+			
+			// Prevent using nested arrays
+			if(toString.call(value) === "[object Array]") {
+				throw 'Nested arrays are not supported by IPv4.Pool#allocate()';
+			}
+		
+			this.allocate(value);
+		}
+	}
+	// Otherwise, allocate the address
+	else {
+		address = address instanceof IPv4.Address ? address : new IPv4.Address(address);
+		
+		if(!this.isAllocated(address)) {
+			this.allocatedAddresses.push(address);
+		}
+	}
+	
+	return this;
+};
+
+/**
+ * Get the first available address
+ * 
+ * @return {IPv4.Address/null} Return the first available address, or `null` if
+ * none is available
+ */
+IPv4.Pool.prototype.getFirstAvailable = function() {
+	
+	var subnet = this.subnet,
+	    first;
+	
+	for(first = subnet.network.getNext() ; first !== null && subnet.isValidAddress(first) && this.isAllocated(first) ; first = first.getNext()) {
+		; // Do nothing
+	}
+	
+	return subnet.isValidAddress(first) ? first : null;
+};
+
+/**
+ * Get the last available address
+ * 
+ * @return {IPv4.Address/null} Return the last available address, or `null` if
+ * none is available
+ */
+IPv4.Pool.prototype.getLastAvailable = function() {
+	
+	var subnet = this.subnet,
+	    last;
+	
+	for(last = subnet.getBroadcastAddress().getPrevious() ; last !== null && subnet.isValidAddress(last) && this.isAllocated(last) ; last = last.getPrevious()) {
+		; // Do nothing
+	}
+	
+	return subnet.isValidAddress(last) ? last : null;
+};
+
+

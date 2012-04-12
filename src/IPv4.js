@@ -281,7 +281,7 @@ IPv4.Subnet.prototype.isBroadcastAddress = function(address) {
  *    3. the address IS NOT the broadcast address (reserved)
  * 
  * @param {Number/String/IPv4.Address} address The address to check
- * @returns {Boolean} Returns `true` if the address is valid, `false` otherwise.
+ * @return {Boolean} Returns `true` if the address is valid, `false` otherwise.
  */
 IPv4.Subnet.prototype.isValidAddress = function(address) {
 	var tmpAddress = this.getAddressAsObject(address);
@@ -410,7 +410,7 @@ IPv4.Pool.prototype.allocate = function(address) {
 /**
  * Get the first available address
  * 
- * @return {IPv4.Address/null} Return the first available address, or `null` if
+ * @return {IPv4.Address} Return the first available address, or `null` if
  * none is available
  */
 IPv4.Pool.prototype.getFirstAvailable = function() {
@@ -428,7 +428,7 @@ IPv4.Pool.prototype.getFirstAvailable = function() {
 /**
  * Get the last available address
  * 
- * @return {IPv4.Address/null} Return the last available address, or `null` if
+ * @return {IPv4.Address} Return the last available address, or `null` if
  * none is available
  */
 IPv4.Pool.prototype.getLastAvailable = function() {

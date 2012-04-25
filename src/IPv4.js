@@ -23,7 +23,7 @@ IPv4.Address = function(address) {
 	
 	// Check parameter
 	if(typeof address !== 'string' && typeof address !== 'number') {
-		throw 'Expecting parameter to be a String/Number, "' + (typeof address) + '" given.';
+		throw new Error('Expecting parameter to be a String/Number, "' + (typeof address) + '" given.');
 	}
 	
 	// If the address is a number, consider it as the IP Address number representation
@@ -32,7 +32,7 @@ IPv4.Address = function(address) {
 		this.address = Number(address);
 		
 		if(this.address < -2147483648 || this.address > 2147483647) {
-			throw 'Invalid IPv4 address "' + this.address + '"';
+			throw new Error('Invalid IPv4 address "' + this.address + '"');
 		}
 		
 	}
@@ -43,7 +43,7 @@ IPv4.Address = function(address) {
 		var ip = address.match && address.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
 		
 		if(!ip || ip[1] > 255 || ip[2] > 255 || ip[3] > 255 || ip[4] > 255) {
-			throw 'Invalid IPv4 Address "' + address + '"';
+			throw new Error('Invalid IPv4 Address "' + address + '"');
 		}
 		
 		// Calculate the IP address number
@@ -79,7 +79,7 @@ IPv4.Address.prototype.getNext = function() {
 	}
 	
 	if(this.address == -1) { // 255.255.255.255
-		throw 'IP address 255.255.255.255 has no next address';
+		throw new Error('IP address 255.255.255.255 has no next address');
 	}
 	
 	return new IPv4.Address(this.address + 1);
@@ -97,7 +97,7 @@ IPv4.Address.prototype.getPrevious = function() {
 	}
 	
 	if(this.address == 0) { // 0.0.0.0
-		throw 'IP address 0.0.0.0 has no previous address';
+		throw new Error('IP address 0.0.0.0 has no previous address');
 	}
 	
 	return new IPv4.Address(this.address - 1);
@@ -126,7 +126,7 @@ IPv4.Mask = function(mask) {
 		// Retrieve the mask size (31 to 0)
 		var maskSize = Number(mask);
 		if(maskSize > 32) {
-			throw 'Expecting mask size between 0 and 32, got ' + maskSize;
+			throw new Error('Expecting mask size between 0 and 32, got ' + maskSize);
 		}
 		
 		// Calculate the actual mask (-xxxx)
@@ -196,7 +196,7 @@ IPv4.Subnet = function(network, mask) {
 	// Check the network/mask validity
 	var networkAddress;
 	if((networkAddress = this.mask.apply(this.network).address) != this.network.address) {
-		throw 'Invalid IPv4 Subnet "' + this + '", should be "' + new IPv4.Subnet(networkAddress, mask) + '".';
+		throw new Error('Invalid IPv4 Subnet "' + this + '", should be "' + new IPv4.Subnet(networkAddress, mask) + '".');
 	}
 };
 
@@ -317,7 +317,7 @@ IPv4.Pool = function(subnet) {
 	
 	// Subnet check
 	if(!subnet || !(subnet instanceof IPv4.Subnet)) {
-		throw 'Expecting parameter to be a IPv4.Subnet, ' + subnet + ' given.';
+		throw new Error('Expecting parameter to be a IPv4.Subnet, ' + subnet + ' given.');
 	}
 	
 	/**
@@ -345,7 +345,7 @@ IPv4.Pool.prototype.isAllocated = function(address) {
 	address = address instanceof IPv4.Address ? address : new IPv4.Address(address);
 	
 	if(!this.subnet.isValidAddress(address)) {
-		throw 'The IP address ' + address + ' does not belong to the subnet ' + this.subnet;
+		throw new Error('The IP address ' + address + ' does not belong to the subnet ' + this.subnet);
 	}
 	
 	for(var i = 0 ; i < this.allocatedAddresses.length ; i++) {
@@ -389,7 +389,7 @@ IPv4.Pool.prototype.allocate = function(address) {
 			
 			// Prevent using nested arrays
 			if(toString.call(value) === "[object Array]") {
-				throw 'Nested arrays are not supported by IPv4.Pool#allocate()';
+				throw new Error('Nested arrays are not supported by IPv4.Pool#allocate()');
 			}
 		
 			this.allocate(value);

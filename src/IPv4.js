@@ -380,6 +380,7 @@ IPv4.Pool.prototype.isAvailable = function(address) {
  * @param {String/Number/IPv4.Address/String[]/Number[]/IPv4.Address[]} address The address(es) to allocate
  */
 IPv4.Pool.prototype.allocate = function(address) {
+	var toString = String.prototype.toString;
 	
 	// If an array, allocate all the IP addresses
 	if(toString.call(address) === "[object Array]") {
